@@ -1,6 +1,6 @@
 const { Types } = require("mongoose");
 const mongoose = require("mongoose");
-const { ImgurClient } = require("imgur");
+const s3 = require('../services/s3ClientConfig');
 const path = require("path");
 const env = require("dotenv");
 env.config({ path: path.join(__dirname, "../../.env") });
@@ -10,10 +10,6 @@ const {
   getFileReferenceModel,
 } = require("../models/folderAndFileModel");
 // Create a new ImgurClient instance
-const client = new ImgurClient({
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-});
 
 async function uploadFile(req) {
   const { folderId } = req.body;
@@ -31,23 +27,23 @@ async function uploadFile(req) {
       throw new Error("Invalid file input.");
     }
 
-    const base64Image = file.buffer.toString("base64");
+    const key = `uploads/${userId}/${Date.now()}_${file.originalname}`;
 
-    const response = await client.upload({
-      image: base64Image,
-      type: "base64",
-    });
+    const s3Response = await s3
+      .upload({
+        Bucket: process.env.BUCKET_NAME,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+      .promise();
 
-    if (!response.success) {
-      throw new Error("Imgur upload failed: " + JSON.stringify(response.data));
-    }
-
-    const imageUrl = response.data.link;
-    const deleteHash = response.data.deletehash; // Get deletehash from Imgur
+    console.log('s3Response', s3Response)
+    const imageUrl = s3Response.Location;
 
     const newFileRef = await new FileReference({
       fileUrl: imageUrl,
-      key: deleteHash,
+      key,
     }).save({ session });
     // Save file metadata including deleteHash
     const newFile = await new File({
@@ -57,7 +53,6 @@ async function uploadFile(req) {
         fileType: file.mimetype,
         size: file.size,
         fileName: file.originalname,
-        // Store Imgur delete hash
       },
       parentFolderId:new Types.ObjectId(folderId)
     }).save({ session });
@@ -99,7 +94,7 @@ async function incrementFileCopyCount(req, session) {
 }
 
 async function copyFile(req) {
-  const { fileId, destinationFolderId } = req.body;
+  const { fileId } = req.body;
   const File = getFileModel(req.userDbConnection);
   const FileReference = getFileReferenceModel(req.userDbConnection);
   const session = await req.userDbConnection.startSession();
@@ -196,8 +191,13 @@ async function deleteFile(req) {
         ref.copiedCount -= 1;
         await ref.save({ session });
       } else {
-        const imgurResponse = await client.deleteImage(ref.key);
-        if (!imgurResponse.success) throw new Error("Imgur deletion failed.");
+        let res = await s3
+        .deleteObject({
+          Bucket: process.env.BUCKET_NAME,
+          Key: ref.key,
+        })
+        .promise();
+        console.log('res', res)
         await FileReference.deleteOne({ _id: ref._id }).session(session);
       }
       await File.deleteOne({ _id: fileId }).session(session);
