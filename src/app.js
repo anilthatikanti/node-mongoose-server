@@ -27,8 +27,8 @@ console.log('Subscription service initialized');
 
 // 🟢 Apply CORS FIRST so it doesn't get blocked by Helmet
 app.use(cors({
-    // origin: 'https://angular-stock.netlify.app', // Adjust to your frontend URL
-    origin: 'http://localhost:4200', // Adjust to your frontend URL
+    origin: 'https://angular-stock.netlify.app', // Adjust to your frontend URL
+    // origin: 'http://localhost:4200', // Adjust to your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
