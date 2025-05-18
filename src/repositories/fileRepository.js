@@ -320,6 +320,7 @@ async function deleteAllTrashFiles(folderId,FileReference, File, session) {
       await ref.save({ session });
     } else {
       try {
+<<<<<<< HEAD
          const deleteParams = {
           Bucket: process.env.BUCKET_NAME,
           Key: ref.key,
@@ -330,6 +331,15 @@ async function deleteAllTrashFiles(folderId,FileReference, File, session) {
         console.error(
             `Error deleting file ${file._id} from S3:`,
           s3Error.message || s3Error
+=======
+        const imgurResponse = await client.deleteImage(ref.key);
+        if (!imgurResponse.success) throw new Error("Imgur deletion failed.");
+        await FileReference.deleteOne({ _id: ref._id }).session(session);
+      } catch (imgurError) {
+        console.error(
+          ` Error deleting file ${file._id} from Imgur:`,
+          imgurError.response?.data || imgurError
+>>>>>>> 8b8246b2e0118899754c09b8509eda55a17da05b
         );
       }
     }
