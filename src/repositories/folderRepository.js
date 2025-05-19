@@ -465,9 +465,11 @@ async function searchFoldersAndFiles(req) {
         },
       },
     ];
+    const currentFolder = await Folder.findOne({ _id: currentFolderObjectId });
     const folders = await Folder.aggregate(folderPipeline);
     const files = await File.aggregate(filePipeline);
     return {
+      currentFolder,
       data: [...folders, ...files],
     };
   } catch (err) {
