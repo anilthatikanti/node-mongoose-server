@@ -205,7 +205,7 @@ const searchStock = async (req, res) => {
   try {
     const { q } = req.query;
 
-    if (!search) {
+    if (!q) {
       return res.status(400).json({ error: "Query is required" });
     }
 
