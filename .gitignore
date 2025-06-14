@@ -30,4 +30,7 @@ logs/
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+
+# Firebase
+admin-setup/firebase.service.account.json
