@@ -25,7 +25,7 @@ subscriptionService.initialize().catch(error => {
 });
 console.log('Subscription service initialized');
 
-// 🟢 Apply CORS FIRST so it doesn't get blocked by Helmet
+// 🟢 Apply CORS FIRST so it doesn't get blocked by Helmet.
 const allowedOrigins = ['https://angular-stock.netlify.app','https://finsync-hazel.vercel.app', 'http://localhost:4200'];
 
 const corsOptions = {
