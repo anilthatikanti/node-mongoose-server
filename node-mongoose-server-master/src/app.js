@@ -30,15 +30,15 @@ const allowedOrigins = ['https://angular-stock.netlify.app','https://finsync-haz
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+   else {
+      return callback(new Error('Not allowed by CORS'));
     }
   },
-    methods: ['GET', 'POST','PATCH', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 // 🔒 Apply Helmet AFTER CORS to avoid blocking important headers
