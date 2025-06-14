@@ -28,18 +28,25 @@ console.log('Subscription service initialized');
 // 🟢 Apply CORS FIRST so it doesn't get blocked by Helmet
 const allowedOrigins = ['https://angular-stock.netlify.app','https://finsync-hazel.vercel.app', 'http://localhost:4200'];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-   else {
-      return callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (like curl, mobile apps)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+  credentials: true,
+};
+
+// ✅ Apply CORS middleware
+app.use(cors(corsOptions));
+
+// ✅ Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 // 🔒 Apply Helmet AFTER CORS to avoid blocking important headers
 app.use(helmet());
