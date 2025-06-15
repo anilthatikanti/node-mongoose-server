@@ -205,7 +205,7 @@ const searchStock = async (req, res) => {
   try {
     const { q } = req.query;
 
-    if (!search) {
+    if (!q) {
       return res.status(400).json({ error: "Query is required" });
     }
 
@@ -221,9 +221,127 @@ const searchStock = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const addStockToWatchListController = async (req, res) => {
+  const { watchListId, stockSymbol, longName } = req.body;
+  try {
+    if (!watchListId || !stockSymbol || !longName) {
+      return res.status(400).json({
+        success: false,
+        error: "Watchlist ID and stock symbol or name are required",
+      });
+    }
+    const result = await WatchListService.addStockToWatchListService(req);
+
+    res.status(200).json({
+      success: true,
+      payload: result,
+      message: "Stock added to watchlist successfully",
+    });
+  } catch (error) {
+    console.error("Error in addStockToWatchList:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const deleteStockFromWatchListController = async (req, res) => {
+  const { watchListId, stockSymbol } = req.body;
+  try {
+    if (!watchListId || !stockSymbol) {
+      return res.status(400).json({
+        success: false,
+        error: "Watchlist ID and stock symbol are required",
+      });
+    }
+    const result = await WatchListService.deleteStockFromWatchListService(req);
+
+    res.status(200).json({
+      success: true,
+      payload: result,
+      message: "Stock deleted from watchlist successfully",
+    });
+  } catch (error) {
+    console.error("Error in deleteStockFromWatchList:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getWatchListsController = async (req, res) => {
+  try {
+    const watchLists = await WatchListService.getWatchListsService(req);
+
+    res.status(200).json({
+      success: true,
+      payload: watchLists,
+      message: "Watchlists fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error in getWatchLists:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getNewsController = async (req, res) => {
+  try {
+    const newsResponse = await fetch( // Renamed 'news' to 'newsResponse' for clarity
+      `https://newsdata.io/api/1/news?apikey=${process.env.NEWS_API_KEY}&language=en&category=business`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      }
+    );
+    if (!newsResponse.ok) {
+      const errorText = await newsResponse.text(); // Get detailed error message from API if available
+      console.error(`NewsData.io API error! Status: ${newsResponse.status}. Details: ${errorText}`);
+      throw new Error(`Failed to fetch news from NewsData.io: ${newsResponse.statusText}.`);
+    }
+
+    // Parse the JSON body of the response
+    const newsData = await newsResponse.json();
+    if (!newsData.results || !Array.isArray(newsData.results) || newsData.results.length === 0) {
+        // You can choose to send an empty array or a specific message if no results
+        return res.status(200).json({
+            status: true,
+            payload: [],
+            message: "No news found matching criteria.",
+        });
+    }
+
+    res.status(200).json({
+      status: true,
+      payload: newsData.results // Use newsData.results here
+        .filter(
+          (item) =>
+            item.image_url !== null &&
+            item.image_url !== "" &&
+            item.description !== null &&
+            item.description !== ""
+        )
+        .map((item) => ({
+          title: item.title,
+          link: item.link,
+          description: item.description,
+          source_name: item.source_name,
+          source_icon: item.source_icon,
+          image_url: item.image_url,
+          pubDate: item.pubDate,
+        })),
+      message: "News fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error in getNewsController:", error);
+    // Send a more user-friendly error message, while logging the full error
+    res.status(500).json({ error: error.message || "An unexpected error occurred." });
+  }
+};
 
 module.exports = {
   getStockHistory,
   getNifty50,
   searchStock,
+  getWatchListsController,
+  addStockToWatchListController,
+  deleteStockFromWatchListController,
+  getNewsController,
 };
