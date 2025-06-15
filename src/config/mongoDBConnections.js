@@ -4,7 +4,9 @@ const env = require("dotenv");
 env.config({ path: path.join(__dirname, "../../.env") });
 
 const { initializeFolder } = require("../repositories/folderRepository");
+const { initializeWatchLists } = require("../repositories/stockRepository");
 const { getFolderModel } = require("../models/folderAndFileModel");
+const {getWatchListModel} = require("../models/stockModel");
 
 let userDbConnection = null;
 
@@ -59,7 +61,9 @@ async function getDatabase(userId) {
     const dbConnection = await initializeUserSpecificDbConnection(userId);
 
     // Ensure FolderModel is retrieved properly
+    const WatchListModel = getWatchListModel(dbConnection);
     const FolderModel = getFolderModel(dbConnection);
+    await initializeWatchLists(WatchListModel);
     await initializeFolder(FolderModel);
 
     console.log(`User ${userId} database initialized.`);
