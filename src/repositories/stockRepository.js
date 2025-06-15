@@ -64,7 +64,7 @@ const deleteStockFromWatchList = async (req) => {
     }
     const result = await watchListModel.updateOne(
       { _id: watchListId },
-      { $pull: { stocks: stockSymbol } } // removes the stock from the array
+      { $pull: { stocks: { symbol: stockSymbol } } } // removes the stock from the array
     );
 
     if (result.modifiedCount > 0) {
