@@ -1,5 +1,8 @@
 const yahooFinance = require("yahoo-finance2").default;
-const { admin } = require("../../admin-setup/firebase-initialize");
+const WatchListService = require("../services/stockService");
+const path = require("path");
+const env = require("dotenv");
+env.config({ path: path.join(__dirname, "../../.env") });
 
 // Cache for date calculations
 const dateCache = new Map();
