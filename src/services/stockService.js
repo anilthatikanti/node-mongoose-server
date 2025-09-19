@@ -27,9 +27,19 @@ async function getWatchListsService(req) {
     throw err;
   }
 }
+async function updateWatchListService(req) {
+  try {
+    const result = await watchListRepository.updateWatchList(req);  
+    return result;
+  } catch (err) {
+    console.error("Failed to update the watchlist:", err);
+    throw err;
+  }
+}
 
 module.exports = {
   addStockToWatchListService,
   deleteStockFromWatchListService,
-  getWatchListsService
+  getWatchListsService,
+  updateWatchListService
 };

@@ -25,7 +25,7 @@ subscriptionService.initialize().catch(error => {
 });
 console.log('Subscription service initialized');
 
-const allowedOrigins = ['https://angular-stock.netlify.app','https://finsync-hazel.vercel.app'];
+const allowedOrigins = ['https://angular-stock.netlify.app','https://finsync-hazel.vercel.app','http://localhost:3100','http://localhost:4200'];
 
 const corsOptions = {
   origin: function (origin, callback) {

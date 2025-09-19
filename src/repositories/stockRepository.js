@@ -1,4 +1,5 @@
-const {getWatchListModel} = require("../models/stockModel");
+const { getWatchListModel } = require("../models/stockModel");
+const { Types } = require("mongoose");
 
 const initializeWatchLists = async (WatchListModel) => {
   if (!WatchListModel) {
@@ -27,7 +28,7 @@ const initializeWatchLists = async (WatchListModel) => {
 
 const addStockToWatchList = async (req) => {
   try {
-    const { watchListId, stockSymbol,longName } = req.body;
+    const { watchListId, stockSymbol, longName } = req.body;
     const WatchListModel = getWatchListModel(req.userDbConnection);
     const result = await WatchListModel.updateOne(
       { _id: watchListId },
@@ -76,13 +77,37 @@ const deleteStockFromWatchList = async (req) => {
       console.log(
         ` Stock '${stockSymbol}' not found in watchlist '${watchListId}'.`
       );
-      return false;
+      throw new Error("Stock not found in watchlist");
     }
   } catch (error) {
     console.error(
       ` Failed to remove stock '${stockSymbol}' from watchlist '${watchListId}':`,
       error
     );
+    throw error;
+  }
+};
+
+const updateWatchList = async (req) => {
+  try {
+    const { watchListId, name } = req.body;
+    console.log("newName", name);
+    const watchListModel = getWatchListModel(req.userDbConnection);
+    const result = await watchListModel.updateOne(
+      { _id: watchListId },
+      { $set: { watchListName: name } },
+      { upsert: false }
+    );
+
+    console.log("result", result);
+    if (result.matchedCount > 0) {
+      console.log(`Watchlist '${watchListId}' renamed to '${name}'.`);
+      return true;
+    } else {
+      console.log(`Watchlist '${watchListId}' not found.`);
+      throw new Error("Watchlist not found");
+    }
+  } catch (error) {
     throw error;
   }
 };
@@ -99,6 +124,12 @@ const getWatchLists = async (req) => {
     console.error("Failed to fetch watchlists:", error);
     throw error;
   }
-}
+};
 
-module.exports = { initializeWatchLists, addStockToWatchList,deleteStockFromWatchList,getWatchLists };
+module.exports = {
+  initializeWatchLists,
+  addStockToWatchList,
+  deleteStockFromWatchList,
+  getWatchLists,
+  updateWatchList,
+};
