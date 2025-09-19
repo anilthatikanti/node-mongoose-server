@@ -1,4 +1,4 @@
-const  watchListRepository = require('../repositories/stockRepository');
+const watchListRepository = require("../repositories/stockRepository");
 async function addStockToWatchListService(req) {
   try {
     const result = await watchListRepository.addStockToWatchList(req);
@@ -29,10 +29,20 @@ async function getWatchListsService(req) {
 }
 async function updateWatchListService(req) {
   try {
-    const result = await watchListRepository.updateWatchList(req);  
+    const result = await watchListRepository.updateWatchList(req);
     return result;
   } catch (err) {
     console.error("Failed to update the watchlist:", err);
+    throw err;
+  }
+}
+
+async function createWatchListService(req) {
+  try {
+    const result = await watchListRepository.createWatchList(req);
+    return result;
+  } catch (err) {
+    console.error("Failed to create the watchlist:", err);
     throw err;
   }
 }
@@ -41,5 +51,6 @@ module.exports = {
   addStockToWatchListService,
   deleteStockFromWatchListService,
   getWatchListsService,
-  updateWatchListService
+  updateWatchListService,
+  createWatchListService,
 };

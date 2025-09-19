@@ -9,6 +9,7 @@ const {
   searchStock,
   addStockToWatchListController,
   deleteStockFromWatchListController,
+  createWatchListController,
 } = require("../controllers/stockController");
 
 // Get stock history (public endpoint)
@@ -19,8 +20,9 @@ router.get("/nifty50", getNifty50);
 router.get("/search", searchStock);
 router.get("/get-news", getNewsController);
 router.get("/get-watchlist", getWatchListsController);
-router.patch("/add-watchlist", addStockToWatchListController);
-router.patch("/del-watchlist", deleteStockFromWatchListController);
+router.patch("/add-stock-watchlist", addStockToWatchListController);
+router.patch("/del-stock-watchlist", deleteStockFromWatchListController);
 router.patch("/update-watchlistName", updateWatchListController);
+router.patch("/create-watchList", createWatchListController);
 
 module.exports = router;

@@ -112,6 +112,23 @@ const updateWatchList = async (req) => {
   }
 };
 
+const createWatchList = async (req) => {
+  try {
+    const { name } = req.body;
+    const watchListModel = getWatchListModel(req.userDbConnection);
+    const newWatchList = new watchListModel({
+      watchListName: name,
+      stocks: [],
+    });
+    const result = await newWatchList.save();
+    console.log(`Watchlist '${name}' created with ID '${result._id}'.`);
+    return result;
+  } catch (error) {
+    console.error("Failed to create watchlist:", error);
+    throw error;
+  }
+};
+
 const getWatchLists = async (req) => {
   try {
     const watchListModel = getWatchListModel(req.userDbConnection);
@@ -132,4 +149,5 @@ module.exports = {
   deleteStockFromWatchList,
   getWatchLists,
   updateWatchList,
+  createWatchList,
 };

@@ -372,6 +372,28 @@ const getNewsController = async (req, res) => {
   }
 };
 
+const createWatchListController = async (req, res) => {
+  const { name } = req.body;
+  try {
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: "Watchlist name is required",
+      });
+    }
+    const result = await WatchListService.createWatchListService(req);
+
+    res.status(200).json({
+      status: true,
+      payload: result,
+      message: "Watchlist created successfully",
+    });
+  } catch (error) {
+    console.error("Error in createWatchList:", error);
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
+
 module.exports = {
   getStockHistory,
   getNifty50,
@@ -381,4 +403,5 @@ module.exports = {
   deleteStockFromWatchListController,
   getNewsController,
   updateWatchListController,
+  createWatchListController,
 };
