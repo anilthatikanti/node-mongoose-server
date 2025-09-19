@@ -10,6 +10,7 @@ const {
   addStockToWatchListController,
   deleteStockFromWatchListController,
   createWatchListController,
+  deleteWatchListController,
 } = require("../controllers/stockController");
 
 // Get stock history (public endpoint)
@@ -23,6 +24,7 @@ router.get("/get-watchlist", getWatchListsController);
 router.patch("/add-stock-watchlist", addStockToWatchListController);
 router.patch("/del-stock-watchlist", deleteStockFromWatchListController);
 router.patch("/update-watchlistName", updateWatchListController);
-router.patch("/create-watchList", createWatchListController);
+router.post("/create-watchList", createWatchListController);
+router.delete("/delete-watchList", deleteWatchListController);
 
 module.exports = router;

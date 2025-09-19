@@ -129,6 +129,27 @@ const createWatchList = async (req) => {
   }
 };
 
+const deleteWatchList = async (req) => {
+  try {
+    const { watchListId } = req.body;
+    const watchListModel = getWatchListModel(req.userDbConnection);
+    if (!Types.ObjectId.isValid(watchListId)) {
+      throw new Error("Invalid watchlist ID.");
+    }
+    const result = await watchListModel.deleteOne({ _id: watchListId });
+    if (result.deletedCount > 0) {
+      console.log(`Watchlist '${watchListId}' deleted successfully.`);
+      return true;
+    } else {
+      console.log(`Watchlist '${watchListId}' not found.`);
+      throw new Error("Watchlist not found");
+    }
+  } catch (error) {
+    console.error("Failed to delete watchlist:", error);
+    throw error;
+  }
+};
+
 const getWatchLists = async (req) => {
   try {
     const watchListModel = getWatchListModel(req.userDbConnection);
@@ -150,4 +171,5 @@ module.exports = {
   getWatchLists,
   updateWatchList,
   createWatchList,
+  deleteWatchList,
 };

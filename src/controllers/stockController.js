@@ -394,6 +394,28 @@ const createWatchListController = async (req, res) => {
   }
 };
 
+const deleteWatchListController = async (req, res) => {
+  const { watchListId } = req.body;
+  try {
+    if (!watchListId) {
+      return res.status(400).json({
+        success: false,
+        error: "Watchlist ID is required",
+      });
+    }
+    const result = await WatchListService.deleteWatchListService(req);
+
+    res.status(200).json({
+      status: true,
+      payload: result,
+      message: "Watchlist deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error in deleteWatchList:", error);
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
+
 module.exports = {
   getStockHistory,
   getNifty50,
@@ -404,4 +426,5 @@ module.exports = {
   getNewsController,
   updateWatchListController,
   createWatchListController,
+  deleteWatchListController,
 };

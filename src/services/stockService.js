@@ -47,10 +47,21 @@ async function createWatchListService(req) {
   }
 }
 
+async function deleteWatchListService(req) {
+  try {
+    const result = await watchListRepository.deleteWatchList(req);
+    return result;
+  } catch (err) {
+    console.error("Failed to delete the watchlist:", err);
+    throw err;
+  }
+}
+
 module.exports = {
   addStockToWatchListService,
   deleteStockFromWatchListService,
   getWatchListsService,
   updateWatchListService,
   createWatchListService,
+  deleteWatchListService,
 };
