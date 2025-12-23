@@ -4,7 +4,7 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files first (for better caching) to app folder
+# Copy dependency files first (for better caching) to app folder.
 COPY package.json package-lock.json ./
 
 # Install only production dependencies
