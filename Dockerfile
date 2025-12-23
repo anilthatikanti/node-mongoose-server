@@ -1,7 +1,20 @@
-FROM node:20
+# Use lightweight Node.js image
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production
+
+# Copy dependency files first (for better caching)
+COPY package.json package-lock.json ./
+
+# Install only production dependencies
+RUN npm ci --omit=dev
+
+# Copy application source code
 COPY . .
+
+# Expose application port
 EXPOSE 3000
+
+# Start the application
 CMD ["node", "src/server.js"]
